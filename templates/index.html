@@ -83,7 +83,7 @@
 
     <script>
         // Stock price trends for the last {{ months }} months
-        var stockTrends = {{ stock_trends | tojson }};
+        var stockTrends = {{ stock_trends | tojson | safe }};
         var canvasEl = document.getElementById('priceChart');
         if (canvasEl) { // Only run if canvas exists
             var ctx = canvasEl.getContext('2d');
@@ -128,7 +128,7 @@
                 }
             });
         }
-    </script>
-    
+      </script>
+
 </body>
 </html>
