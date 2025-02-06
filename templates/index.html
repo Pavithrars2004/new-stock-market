@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Investment Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-logo">
+                <i class="fas fa-chart-line"></i> 
+                <span>Investment Advisor</span>
+            </div>
+        </header>
+
+        <!-- Form Section -->
+        <section class="form-section">
+            <h2 class="form-heading">Get Investment Recommendations</h2>
+            <form action="/recommend" method="POST">
+                <div class="form-group">
+                    <label for="income"><i class="fas fa-wallet"></i> Monthly Income:</label>
+                    <input type="number" id="income" name="income" placeholder="Enter your monthly income" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="return_target"><i class="fas fa-arrow-up"></i> Desired Return (%):</label>
+                    <input type="number" id="return_target" name="return_target" placeholder="Enter desired return" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="months"><i class="fas fa-calendar-alt"></i> Investment Duration (Months):</label>
+                    <input type="number" id="months" name="months" placeholder="Enter investment period" required>
+                </div>
+
+                <button type="submit"><i class="fas fa-search"></i> Get Recommendation</button>
+            </form>
+        </section>
+
+        <!-- Results Section -->
+        {% if recommendations %}
+        <section class="results-section">
+            <div class="card">
+                <h2><i class="fas fa-stocks"></i> Recommended Stocks</h2>
+                <table>
+                    <tr>
+                        <th>Stock</th>
+                        <th>Price</th>
+                        <th>Estimated Return</th>
+                    </tr>
+                    {% for rec in recommendations %}
+                    <tr>
+                        <td>{{ rec.stock }}</td>
+                        <td>${{ rec.current_price }}</td>
+                        <td>${{ rec.estimated_return }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Price Trends</h2>
+                <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-lightbulb"></i> Investment Advice</h3>
+                <ul>
+                    {% for line in advice %}
+                        <li>{{ line }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+
+    <script>
+        // Stock price trends for the last {{ months }} months
+        var stockTrends = {{ stock_trends | tojson }};
+        var ctx = document.getElementById('priceChart').getContext('2d');
+        
+        var datasets = [];
+        var labels = [];
+        
+        for (var stock in stockTrends) {
+            datasets.push({
+                label: stock,
+                data: stockTrends[stock],
+                borderColor: '#4CAF50',
+                fill: false
+            });
+            labels = stockTrends[stock].map((_, index) => `Month ${index + 1}`);
+        }
+
+        var priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Months'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price ($)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
