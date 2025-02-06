@@ -84,46 +84,51 @@
     <script>
         // Stock price trends for the last {{ months }} months
         var stockTrends = {{ stock_trends | tojson }};
-        var ctx = document.getElementById('priceChart').getContext('2d');
-        
-        var datasets = [];
-        var labels = [];
-        
-        for (var stock in stockTrends) {
-            datasets.push({
-                label: stock,
-                data: stockTrends[stock],
-                borderColor: '#4CAF50',
-                fill: false
-            });
-            labels = stockTrends[stock].map((_, index) => `Month ${index + 1}`);
-        }
-
-        var priceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Months'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Price ($)'
+        var canvasEl = document.getElementById('priceChart');
+        if (canvasEl) { // Only run if canvas exists
+            var ctx = canvasEl.getContext('2d');
+            var datasets = [];
+            var labels = [];
+            
+            for (var stock in stockTrends) {
+                datasets.push({
+                    label: stock,
+                    data: stockTrends[stock],
+                    borderColor: '#4CAF50',
+                    fill: false
+                });
+                labels = stockTrends[stock].map(function(_, index) { 
+                    return 'Month ' + (index + 1);
+                });
+            }
+            
+            var priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Months'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price ($)'
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
     </script>
+    
 </body>
 </html>
