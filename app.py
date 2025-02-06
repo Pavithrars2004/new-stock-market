@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    # Provide default values to avoid Undefined errors in the template
+    # Provide default values for templates variables:
     return render_template('index.html', recommendations=None, stock_trends={}, months=0, advice=[])
 
 @app.route('/recommend', methods=['POST'])
